@@ -61,7 +61,7 @@ structure ArXiv where
 deriving ToJson, FromJson, BEq, Hashable
 
 section
-def _root_.Ord.arrayOrd {α} [Ord α] : Ord (Array α) := inferInstance
+@[inline] def _root_.Ord.arrayOrd {α} [Ord α] : Ord (Array α) := inferInstance
 attribute [local instance] Ord.arrayOrd
 deriving instance Ord for InProceedings, ArXiv
 end
@@ -147,12 +147,12 @@ def Citable.bibHtml (go : Doc.Inline Genre.Manual → HtmlT Manual (ReaderT Exte
   match c with
   |  .inProceedings p =>
     let authors ← andList <$> p.authors.mapM go
-    return {{ {{authors}} s!", {p.year}. " {{ link {{""" {{← go p.title}} ""}} }} ". In " <em>{{← go p.booktitle}}"."</em>{{(← p.series.mapM go).map ({{" (" {{·}} ")" }}) |>.getD .empty}} }}
+    return {{ {{authors}} s!", {p.year}. " {{ link {{"“" {{← go p.title}} "”"}} }} ". In " <em>{{← go p.booktitle}}"."</em>{{(← p.series.mapM go).map ({{" (" {{·}} ")" }}) |>.getD .empty}} }}
   | .thesis p =>
     return {{ {{← go p.author}} s!", {p.year}. " <em>{{link (← go p.title)}}</em> ". " {{← go p.degree}} ", " {{← go p.university}} }}
   | .arXiv p =>
     let authors ← andList <$> p.authors.mapM go
-    return {{ {{authors}} s!", {p.year}. " {{ link {{"" {{← go p.title}} ""}} }} ". arXiv:" {{p.id}} }}
+    return {{ {{authors}} s!", {p.year}. " {{ link {{"“" {{← go p.title}} "”"}} }} ". arXiv:" {{p.id}} }}
 where
   wrap (content : Html) : Html := {{<span class="citation">{{content}}</span>}}
   link (title : Html) : Html :=
@@ -174,7 +174,7 @@ def Citable.inlineHtml
   | .parenthetical =>
     let out : Array Html ← ps.toArray.mapM fun p => do
       let m ← p.bibHtml go
-      pure <| {{" ({← authorHtml p}} s!", ({p.year})"}} ++ Marginalia.html m
+      pure <| {{" (" {{← authorHtml p}} s!", {p.year})"}} ++ Marginalia.html m
     pure <| andList out
   | .here => do
     pure <| andList (← ps.toArray.mapM (·.bibHtml go))
