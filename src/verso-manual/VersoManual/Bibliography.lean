@@ -11,6 +11,7 @@ import Verso.Output.Html
 import Verso.Output.TeX
 import VersoManual.Basic
 import VersoManual.Marginalia
+import VersoManual.Compat
 
 
 open Lean Elab
